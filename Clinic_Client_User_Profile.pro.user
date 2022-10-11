@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 8.0.1, 2022-10-11T10:37:19. -->
+<!-- Written by QtCreator 8.0.1, 2022-10-11T10:42:01. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -235,8 +235,9 @@
     <valuelist type="QVariantList" key="CustomOutputParsers"/>
     <value type="int" key="PE.EnvironmentAspect.Base">2</value>
     <valuelist type="QVariantList" key="PE.EnvironmentAspect.Changes"/>
-    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4RunConfiguration:D:/Clinic/Clinic_Client_User_Profile/Clinic_Client_User_Profile.pro</value>
-    <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">D:/Clinic/Clinic_Client_User_Profile/Clinic_Client_User_Profile.pro</value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Clinic_Client_User_Profile2</value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4RunConfiguration:D:/from_github/Clinic_Client_User_Profile/Clinic_Client_User_Profile.pro</value>
+    <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">D:/from_github/Clinic_Client_User_Profile/Clinic_Client_User_Profile.pro</value>
     <value type="bool" key="RunConfiguration.UseCppDebugger">false</value>
     <value type="bool" key="RunConfiguration.UseCppDebuggerAuto">true</value>
     <value type="bool" key="RunConfiguration.UseLibrarySearchPath">true</value>
