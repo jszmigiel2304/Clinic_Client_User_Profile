@@ -783,7 +783,7 @@ color: rgb(255, 255, 255);</string>
       <string notr="true">color: rgb(221, 221, 221);</string>
      </property>
      <property name="text">
-      <string>[EMPLOYEE_NAME]</string>
+      <string>Dane pracownika</string>
      </property>
      <property name="indent">
       <number>10</number>
