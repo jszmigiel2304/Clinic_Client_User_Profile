@@ -66,6 +66,28 @@ myStructures::threadData c_Parser::ParseJsonPacket(QByteArray json, qintptr sock
     return packetData;
 }
 
+QMap<QString, QVariant> c_Parser::ParseArguments(int &argc, char **argv)
+{
+    QMap<QString, QVariant> map;
+     for(int i = 0; i < argc; i++) {
+         QString item = QString(argv[i]);
+         if( item.first(5) == QString("MyArg") ) {
+             QStringList temp = item.split('=');
+             if(!temp.isEmpty()) {
+                QString key = temp[0].remove(0,5);
+                QVariant arg = temp[1];
+                map[key] = arg;
+             }
+         } else {
+             QString key = QString("Arg_%1").arg(i);
+             QVariant arg = item;
+             map[key] = arg;
+         }
+     }
+
+     return map;
+}
+
 QPair<QByteArray, QByteArray> c_Parser::prepareLogInPacket(QString name, QString encryptedPassword, quint32 threadID)
 {
     QByteArray packet;

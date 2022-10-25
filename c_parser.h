@@ -20,6 +20,7 @@ public:
 
     QPair<QByteArray, QByteArray> ParseReceivedPacket(quint64 size, QByteArray data/*, qintptr socketDescriptor*/);
     myStructures::threadData ParseJsonPacket(QByteArray json, qintptr socketDescriptor);
+    static QMap<QString, QVariant> ParseArguments(int &argc, char **argv);
     //------------------------------ client -> server ------------------------------------------------------------------------------------//
     QPair<QByteArray, QByteArray> prepareLogInPacket(QString name, QString encryptedPassword, quint32 threadID = 0);
     QPair<QByteArray, QByteArray> prepareLogInPacket(qint32 id, QString name, QString encryptedPassword, quint32 threadID = 0);
@@ -44,6 +45,7 @@ public:
 
     QJsonDocument prepareJson(QMap<QString, QVariant> packet_info, QList<QMap<QString, QVariant>> packet_data);
 
+
 public slots:
     QPair<QByteArray, QByteArray> parseData(quint64 data_size, QByteArray data);
     void parseJson(QByteArray * json, myStructures::threadData * data);
@@ -52,6 +54,7 @@ public slots:
 
 private:
     QByteArray getJsonMD5Hash(QJsonDocument json);
+
 
 signals:
 

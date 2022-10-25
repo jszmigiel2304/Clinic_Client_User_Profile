@@ -28,6 +28,12 @@ namespace myTypes {
 }
 
 namespace myStructures {
+    struct authenticator {
+        qint32 id;
+        QString name;
+        QString password;
+    };
+
     struct threadData {
         qintptr socketDescriptor;
         myTypes::JsonContent content;

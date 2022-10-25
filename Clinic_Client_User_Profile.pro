@@ -10,17 +10,27 @@ CONFIG += c++17
 
 SOURCES += \
     c_clientprocessconnection.cpp \
+    c_employee.cpp \
+    c_moduleapplication.cpp \
     c_parser.cpp \
+    c_usercontroller.cpp \
     cv_processdata.cpp \
+    m_employee.cpp \
+    m_user.cpp \
     main.cpp \
     w_logswindow.cpp \
     w_mainwindow.cpp
 
 HEADERS += \
     c_clientprocessconnection.h \
+    c_employee.h \
+    c_moduleapplication.h \
     c_myStructures.h \
     c_parser.h \
+    c_usercontroller.h \
     cv_processdata.h \
+    m_employee.h \
+    m_user.h \
     w_logswindow.h \
     w_mainwindow.h
 
