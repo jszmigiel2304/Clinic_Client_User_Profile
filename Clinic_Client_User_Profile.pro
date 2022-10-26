@@ -9,9 +9,11 @@ CONFIG += c++17
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    c_actionexecutive.cpp \
     c_clientprocessconnection.cpp \
     c_employee.cpp \
     c_moduleapplication.cpp \
+    c_modulecontroller.cpp \
     c_parser.cpp \
     c_usercontroller.cpp \
     cv_processdata.cpp \
@@ -22,9 +24,11 @@ SOURCES += \
     w_mainwindow.cpp
 
 HEADERS += \
+    c_actionexecutive.h \
     c_clientprocessconnection.h \
     c_employee.h \
     c_moduleapplication.h \
+    c_modulecontroller.h \
     c_myStructures.h \
     c_parser.h \
     c_usercontroller.h \

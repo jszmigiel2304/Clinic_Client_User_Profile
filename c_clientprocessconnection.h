@@ -37,6 +37,7 @@ public:
     void setLogsWindow(w_logsWindow *newLogsWindow);
 
 public slots:
+    void replyReceived(QByteArray processedRequestMd5Hash, QByteArray json);
 
 private:
     QLocalSocket *socket;
@@ -58,15 +59,13 @@ private slots:
     void bytesWritten(qint64 bytes);
     void readyRead();
 
-    void parseReceivedPacket(quint64 size, QByteArray data, qintptr socketDescriptor);
     void passDataToClient(myStructures::packet packet);
 
 signals:
     void newLog(QString log);
     void error(QLocalSocket::LocalSocketError error);
-    void dataRead(quint64 size, QByteArray data, qintptr socketDescriptor);
     void sendDataToClient(myStructures::packet packet);
-
+    void dataReceived(quint64 data_size, QByteArray data);
 };
 
 #endif // C_CLIENTPROCESSCONNECTION_H

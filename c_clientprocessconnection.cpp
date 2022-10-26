@@ -3,6 +3,8 @@
 c_clientProcessConnection::c_clientProcessConnection(QByteArray serverIdentifier, QObject *parent)
     : QObject{parent}, serverIdentifier(serverIdentifier)
 {
+    logsWindow = w_logsWindow::Instance();
+
     configuredCorrectly = false;
     socket = new QLocalSocket();
 
@@ -17,15 +19,13 @@ c_clientProcessConnection::c_clientProcessConnection(QByteArray serverIdentifier
     connect(this->socket, SIGNAL(readyRead()), this, SLOT(readyRead()));
     //from c_clientProcessConnection
     connect(this, SIGNAL(sendDataToClient(myStructures::packet)), this, SLOT(passDataToClient(myStructures::packet)));
-//    void dataRead(quint64 size, QByteArray data, qintptr socketDescriptor);
-//    void sendDataToClient(myStructures::packet packet);
-
 
 }
 
 c_clientProcessConnection::~c_clientProcessConnection()
 {
-
+    socket->disconnectFromServer();
+    socket->deleteLater();
 }
 
 void c_clientProcessConnection::establishConnection()
@@ -51,6 +51,21 @@ w_logsWindow *c_clientProcessConnection::getLogsWindow() const
 void c_clientProcessConnection::setLogsWindow(w_logsWindow *newLogsWindow)
 {
     logsWindow = newLogsWindow;
+}
+
+void c_clientProcessConnection::replyReceived(QByteArray processedRequestMd5Hash, QByteArray json)
+{
+    c_Parser parser;
+
+    myStructures::packet packet;
+    packet.md5_hash = parser.getJsonMD5Hash( QJsonDocument::fromJson(json) );
+    packet.wait_for_reply = false;
+
+    QDataStream ds2(&packet.packet_to_send, QIODevice::ReadWrite);
+    ds2.setVersion(QDataStream::Qt_6_0);
+
+    ds2 << packet.md5_hash.toHex() << json;
+    emit sendDataToClient(packet);
 }
 
 void c_clientProcessConnection::connected()
@@ -106,18 +121,26 @@ void c_clientProcessConnection::bytesWritten(qint64 bytes)
 }
 
 void c_clientProcessConnection::readyRead()
-{    
+{        
     logsWindow->addLog( QString("c_clientProcessConnection::readyRead() - zaczynam czytać \n") );
+
+    QByteArray myPack;
+
+    while(socket->canReadLine()) {
+        QByteArray line = QByteArray( socket->readLine() );
+        if( QString::fromUtf8(line) == QString("PACKET_BEGINNING\n") ) {
+            myPack.clear();
+        } else if( QString::fromUtf8(line) == QString("PACKET_END\n") ) {
+            QString log = QString("%1 has been read. \n").arg(myPack.size());
+            emit newLog(log);
+
+            emit dataReceived(myPack.size(), myPack);
+        } else {
+            myPack.append(line);
+        }
+    }
 }
 
-void c_clientProcessConnection::parseReceivedPacket(quint64 size, QByteArray data, qintptr socketDescriptor)
-{
-        c_Parser parser;
-        QPair<QByteArray, QByteArray> receivedDataFromServer = parser.parseData(size, data);
-        myStructures::threadData attchedData;
-        parser.parseJson( &receivedDataFromServer.second, &attchedData );
-
-}
 
 void c_clientProcessConnection::passDataToClient(myStructures::packet packet)
 {

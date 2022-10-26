@@ -3,6 +3,7 @@
 #include "c_parser.h"
 #include "c_moduleapplication.h"
 #include "c_clientprocessconnection.h"
+#include "c_modulecontroller.h"
 
 #include <QApplication>
 #include <QMap>
@@ -17,7 +18,8 @@ int main(int argc, char *argv[])
     QMap<QString, QVariant> args = c_Parser::ParseArguments(argc, argv);
     c_moduleApplication a(argc, argv);
 
-
+    //sprawdzenie poprawności otrzymanych argumentów z Clinic Client
+    //użytkownik musi być zalogowany, inaczej zamknij aplikację
     {
     if(args["ServerName"].toByteArray().isEmpty()) {
         QMessageBox::critical(nullptr, QString("Błąd uruchamiania."),
@@ -38,30 +40,38 @@ int main(int argc, char *argv[])
         return 0xff03;
     }
     }
+    //---------------------------------------------------------------
 
 
-    w_MainWindow w;
-    w_logsWindow * logsWindow = w_logsWindow::Instance();
-
-    c_clientProcessConnection * connection = new c_clientProcessConnection( QByteArray::fromHex( args["ServerName"].toByteArray() ) );
-    a.setProcessIdentifier( QByteArray::fromHex( args["ModuleName"].toByteArray() ));
-    a.setThreadIdentifier( args["ThreadId"].toInt() );
-    connection->setLogsWindow(logsWindow);
-
+    { //do usuniecia, wyświetla otrzymane argumenty w w_logsWindow
     QString log = QString("Otrzymane argumenty: \n");
     foreach (const QString key, args.keys()) {
         log += QString("%1:\t%2\n").arg(key, args[key].toString());
     }
-    logsWindow->addLog(log);
+    w_logsWindow::Instance()->addLog(log);
+    }//do usuniecia
 
-    connection->establishConnection();
 
-    QObject::connect(&a, SIGNAL(aboutToQuit()), connection, SLOT(deleteLater()));
-    QObject::connect(&a, SIGNAL(aboutToQuit()), logsWindow, SLOT(deleteLater()));
 
-    w.show();
-    logsWindow->show();
 
+    a.setProcessIdentifier( QByteArray::fromHex( args["ModuleName"].toByteArray() ));
+    a.setThreadIdentifier( args["ThreadId"].toInt() );
+    w_MainWindow *w = new w_MainWindow();
+
+    c_moduleController * moduleCtrlr = new c_moduleController(QByteArray::fromHex(args["ServerName"].toByteArray()),
+                                                            QByteArray::fromHex(args["ModuleName"].toByteArray()),
+                                                            args["ThreadId"].toInt());
+    moduleCtrlr->setMainWnd(w);
+
+    moduleCtrlr->connectToLocalServer();
+
+
+
+    QObject::connect(&a, SIGNAL(aboutToQuit()), moduleCtrlr, SLOT(deleteLater()));
+    QObject::connect(&a, SIGNAL(aboutToQuit()), w, SLOT(deleteLater()));
+
+    w->show();
+    w_logsWindow::Instance()->show();
 
     return a.exec();
 }

@@ -9,6 +9,7 @@ class cv_ProcessData
 public:
     cv_ProcessData();
 
+public slots:
     virtual void processData(myStructures::threadData data);
 };
 

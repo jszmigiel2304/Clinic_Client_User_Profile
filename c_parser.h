@@ -44,6 +44,7 @@ public:
 
 
     QJsonDocument prepareJson(QMap<QString, QVariant> packet_info, QList<QMap<QString, QVariant>> packet_data);
+    QByteArray getJsonMD5Hash(QJsonDocument json);
 
 
 public slots:
@@ -53,7 +54,6 @@ public slots:
     void parseErrors(QList<QMap<QString, QVariant>> * jsonData, QMap<QString, QString> * processedDataErrors);
 
 private:
-    QByteArray getJsonMD5Hash(QJsonDocument json);
 
 
 signals:

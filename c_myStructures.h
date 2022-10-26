@@ -22,7 +22,7 @@ namespace myTypes {
                       SESSION_STATE_UPDATE_CONFIRMATION = 0x000003F0, SESSION_FILE_UPDATE_CONFIRMATION = 0x000003F1, SESSION_CLOSE_TIME_UPDATE_CONFIRMATION = 0x000003F2, SESSION_UNLOCK_CONFIRMATION = 0x000003F3,
                        EMPLOYEE_PROPERTIES_REQUEST = 0x00000400, EMPLOYEE_PROPERTIES_ANSWER = 0x00000401, EMPLOYEE_LOGS_REQUEST = 0x00000402, EMPLOYEE_LOGS_ANSWER = 0x00000403,
 
-                       CONNECTION_TO_PROCESS_REQUEST = 0xFFFF0000
+                       CONNECTION_TO_PROCESS_REQUEST = 0xFFFF0000, CONNECTION_TO_PROCESS_ANSWER = 0xFFFF0001
                      };
 
 }
@@ -44,6 +44,27 @@ namespace myStructures {
         QByteArray ref_md5;
         //quint64 data_size;
         QList<QMap<QString, QVariant>> data;
+
+        QString toString() {
+            QString str = ref_md5;
+
+            switch(thread_dest) {
+            case myTypes::SERVER: { str += QString("\nThread dest: SERVER \n"); break;}
+            case myTypes::CLINIC: { str += QString("\nThread dest: CLINIC \n");  break;}
+            case myTypes::CLINIC_CONNECTION_CONTROLLER: { str += QString("\nThread dest: CLINIC_CONNECTION_CONTROLLER \n");  break;}
+            case myTypes::CLINIC_SESSION_CONTROLLER: { str += QString("\nThread dest: CLINIC_SESSION_CONTROLLER \n");  break;}
+            case myTypes::CLINIC_LOGGED_USER_CONTROLLER: { str += QString("\nThread dest: CLINIC_LOGGED_USER_CONTROLLER \n");  break;}
+            case myTypes::CLINIC_MODULE_PROCESS_CONTROLLER: { str += QString("\nThread dest: CLINIC_MODULE_PROCESS_CONTROLLER \n");  break;}
+            case myTypes::CLINIC_MODULE: { str += QString("\nThread dest: CLINIC_MODULE \n");  break;}
+            case myTypes::CLINIC_MODULE_ERROR: { str += QString("\nThread dest: CLINIC_MODULE_ERROR \n");  break;}
+            case myTypes::CLINIC_MODULE_CONNECTION_CONTROLLER: { str += QString("\nThread dest: CLINIC_MODULE_CONNECTION_CONTROLLER \n");  break;}
+            case myTypes::SERVER_ERROR_CONTROLLER: { str += QString("\nThread dest: SERVER_ERROR_CONTROLLER \n");  break;}
+            case myTypes::CLINIC_ERROR_CONTROLLER: { str += QString("\nThread dest:CLINIC_ERROR_CONTROLLER\n");  break;}
+            default: {str += QString("\nThread dest: ERROR !!!!!!!!!!\n");   break;}
+            }
+
+            return str;
+        };
     };
 
     struct packet {
