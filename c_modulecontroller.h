@@ -6,9 +6,12 @@
 #include "w_mainwindow.h"
 #include "c_clientprocessconnection.h"
 #include "c_actionexecutive.h"
+#include "c_waitingloop.h"
+#include "c_usercontroller.h"
 
 #include <QObject>
 #include <QObject>
+#include <QMessageBox>
 
 class c_moduleController : public QObject, public cv_ProcessData
 {
@@ -40,9 +43,14 @@ public:
 
     myTypes::ThreadDestination getNameThreadDestination() const;
 
+    c_userController *getUserCtrlr() const;
+    void setUserCtrlr(c_userController *newUserCtrlr);
+
 public slots:
     void dataReceived(myStructures::threadData data);
     void processData(myStructures::threadData data) override;
+    void updateMainWindow();
+    void moduleConnectedWithLocalServer();
 
 
 private:
@@ -56,11 +64,21 @@ private:
     w_MainWindow * mainWnd;
     c_clientProcessConnection *connection;
 
+    c_waitingLoop::c_waitingLoop *waitingLoop;
+
+    c_userController *userCtrlr;
+
 private slots:
     void dataReceived(quint64 data_size, QByteArray data);
+    void getPropertiesFromServer(QMap<QString, QVariant> *userProperties, QMap<QString, QVariant> *employeeProperties, QList<myStructures::myLog> * Logs);
+    void getUserPropertiesFromServer(qint32 id = -1, QString name = QString(""), QString password = QString(""));
+    void getEmployeePropertiesFromServer(qint32 id = -1, QString name = QString(""), QString password = QString(""));
+    void getLogsFromServer(qint32 id = -1, QString name = QString(""), QString password = QString(""));
 
 signals:
     void aboutToClose();
+    void getWindowProperties(QMap<QString, QVariant> * userProperties, QMap<QString, QVariant> * employeeProperties, QList<myStructures::myLog> * Logs);
+    void moduleConnectedWithServer();
 
 };
 

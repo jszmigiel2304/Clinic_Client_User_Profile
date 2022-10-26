@@ -6,6 +6,7 @@
 #include "w_logswindow.h"
 #include "c_parser.h"
 #include "c_moduleapplication.h"
+#include "c_actionexecutive.h"
 
 #include <QObject>
 #include <QLocalSocket>
@@ -19,6 +20,7 @@
 #include <QTime>
 #include <QTimer>
 #include <QApplication>
+#include <QMessageBox>
 
 class c_clientProcessConnection : public QObject, public cv_ProcessData
 {
@@ -35,6 +37,9 @@ public:
 
     w_logsWindow *getLogsWindow() const;
     void setLogsWindow(w_logsWindow *newLogsWindow);
+
+    bool getConfiguredCorrectly() const;
+    void setConfiguredCorrectly(bool newConfiguredCorrectly);
 
 public slots:
     void replyReceived(QByteArray processedRequestMd5Hash, QByteArray json);
@@ -66,6 +71,7 @@ signals:
     void error(QLocalSocket::LocalSocketError error);
     void sendDataToClient(myStructures::packet packet);
     void dataReceived(quint64 data_size, QByteArray data);
+    void connectedToLocalServer();
 };
 
 #endif // C_CLIENTPROCESSCONNECTION_H

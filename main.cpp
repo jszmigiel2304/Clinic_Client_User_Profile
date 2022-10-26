@@ -4,6 +4,7 @@
 #include "c_moduleapplication.h"
 #include "c_clientprocessconnection.h"
 #include "c_modulecontroller.h"
+#include "c_usercontroller.h"
 
 #include <QApplication>
 #include <QMap>
@@ -12,6 +13,7 @@
 #include <QMessageBox>
 #include <QByteArray>
 #include <QObject>
+#include <QMessageBox>
 
 int main(int argc, char *argv[])
 {
@@ -53,25 +55,28 @@ int main(int argc, char *argv[])
 
 
 
+    w_logsWindow::Instance()->show();
 
     a.setProcessIdentifier( QByteArray::fromHex( args["ModuleName"].toByteArray() ));
     a.setThreadIdentifier( args["ThreadId"].toInt() );
-    w_MainWindow *w = new w_MainWindow();
+//    w_MainWindow *w = new w_MainWindow();
 
     c_moduleController * moduleCtrlr = new c_moduleController(QByteArray::fromHex(args["ServerName"].toByteArray()),
                                                             QByteArray::fromHex(args["ModuleName"].toByteArray()),
                                                             args["ThreadId"].toInt());
-    moduleCtrlr->setMainWnd(w);
 
+//    moduleCtrlr->setMainWnd(w);
+    moduleCtrlr->getMainWnd()->show();
     moduleCtrlr->connectToLocalServer();
+    moduleCtrlr->setUserCtrlr( new c_userController(args) );
+    moduleCtrlr->updateMainWindow();
 
 
 
     QObject::connect(&a, SIGNAL(aboutToQuit()), moduleCtrlr, SLOT(deleteLater()));
-    QObject::connect(&a, SIGNAL(aboutToQuit()), w, SLOT(deleteLater()));
+//    QObject::connect(&a, SIGNAL(aboutToQuit()), w, SLOT(deleteLater()));
 
-    w->show();
-    w_logsWindow::Instance()->show();
+//    w->show();
 
     return a.exec();
 }

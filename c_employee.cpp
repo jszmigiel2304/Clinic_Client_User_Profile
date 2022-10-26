@@ -22,7 +22,9 @@ void c_employee::setSupervisor(c_employee *newSupervisor)
 }
 
 QMap<QString, QVariant> c_employee::getProperties(bool combinedAddress, bool combinedPhones)
-{
+{    
+    if(getId() <= 0 || getName().isEmpty()) return QMap<QString, QVariant>();
+
     QMap<QString, QVariant> map;
 
     map["id"] = this->getId();

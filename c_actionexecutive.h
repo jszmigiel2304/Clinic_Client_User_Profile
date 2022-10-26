@@ -56,6 +56,8 @@ signals:
     void errors(QMap<QString, QString> * receivedErrors);
     void replyReady(QByteArray processedRequestMd5Hash, QByteArray json);
 
+    void connectionEstablishedConfirmationReceived();
+
 };
 
 #endif // C_ACTIONEXECUTIVE_H

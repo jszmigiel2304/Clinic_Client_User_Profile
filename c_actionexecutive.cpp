@@ -127,6 +127,10 @@ void c_actionExecutive::processRequest(myStructures::threadData data, QMap<QStri
 void c_actionExecutive::processResults(myTypes::JsonContent jsonContent, QList<QMap<QString, QVariant> > results)
 {
     switch (jsonContent) {    
+    case myTypes::CONNECTION_ESTABLISHED_CONFIRMATION: {
+        emit connectionEstablishedConfirmationReceived();
+        break;
+    }
     case myTypes::ERRORS: {
         emit errors(&processedDataErrors);
         break;

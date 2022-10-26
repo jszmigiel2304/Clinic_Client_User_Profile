@@ -16,6 +16,7 @@ SOURCES += \
     c_modulecontroller.cpp \
     c_parser.cpp \
     c_usercontroller.cpp \
+    c_waitingloop.cpp \
     cv_processdata.cpp \
     m_employee.cpp \
     m_user.cpp \
@@ -32,6 +33,7 @@ HEADERS += \
     c_myStructures.h \
     c_parser.h \
     c_usercontroller.h \
+    c_waitingloop.h \
     cv_processdata.h \
     m_employee.h \
     m_user.h \

@@ -4,19 +4,28 @@ c_userController::c_userController(QObject *parent)
     : m_user{parent}
 {
     logs = w_logsWindow::Instance();
+    setEmployee(new c_employee(true));
+    logs->addLog(QString("Utworzono c_userController\n"));
 }
 
 c_userController::c_userController(QMap<QString, QVariant> properties, QObject *parent)
     : m_user{parent}
 {
     logs = w_logsWindow::Instance();
+    setEmployee(new c_employee(true));
+    logs->addLog(QString("Utworzono c_userController\n"));
     setProperties(properties);
 }
 
 QMap<QString, QVariant> c_userController::getUserProperties()
 {
-    QMap<QString, QVariant> map;
+    QMessageBox msgBox;
+    msgBox.setText("c_userController::getUserProperties()");
+    msgBox.exec();
 
+    if(getId() <= 0 || getName().isEmpty()) return QMap<QString, QVariant>();
+
+    QMap<QString, QVariant> map;
 
     map["id"] = this->getId();
     map["name"] = this->getName();
@@ -30,12 +39,20 @@ QMap<QString, QVariant> c_userController::getUserProperties()
     map["is_logged"] = this->getIsLogged();
     map["photo"] = this->getPhoto();
 
+    logs->addLog(QString("getUserProperties() zwracam mape\n"));
+    QMessageBox msgBox2;
+    msgBox2.setText("c_userController::getUserProperties() konice");
+    msgBox2.exec();
 
     return map;
 }
 
 QMap<QString, QVariant> c_userController::getEmployeeProperties()
-{
+{    
+    logs->addLog(QString("getEmployeeProperties() zwracam mape\n"));
+    QMessageBox msgBox;
+    msgBox.setText("c_userController::getEmployeeProperties()");
+    msgBox.exec();
     return this->getEmployee()->getProperties(true, true);
 }
 
@@ -55,6 +72,8 @@ void c_userController::setProperties(QMap<QString, QVariant> userInfo)
     QMetaEnum metaEnum = QMetaEnum::fromType<m_user::UserRole>();
     setRole( static_cast<m_user::UserRole>( metaEnum.keyToValue(userInfo["role"].toString().toStdString().c_str() ) ) );
     setIsLogged( userInfo["logged"].toBool() );
+
+    logs->addLog(QString("setProperties() ustawiono dane\n"));
 
     emit propertiesSaved();
     emit passProperties(userInfo);

@@ -10,6 +10,7 @@
 #include <QMap>
 #include <QVariant>
 #include <QMetaEnum>
+#include <QMessageBox>
 
 class c_userController : public m_user
 {

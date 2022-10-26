@@ -1,4 +1,7 @@
 #include "c_clientprocessconnection.h"
+#include "c_modulecontroller.h"
+
+#define _PARENT_MOD_CTRLR_ dynamic_cast<c_moduleController *>(parent())
 
 c_clientProcessConnection::c_clientProcessConnection(QByteArray serverIdentifier, QObject *parent)
     : QObject{parent}, serverIdentifier(serverIdentifier)
@@ -40,7 +43,28 @@ void c_clientProcessConnection::establishConnection()
 
 void c_clientProcessConnection::processData(myStructures::threadData data)
 {
+    logsWindow->addLog(data.toString());
 
+    if(data.thread_dest == myTypes::CLINIC_MODULE_CONNECTION_CONTROLLER  || data.thread_dest == myTypes::CLINIC_MODULE_ERROR)
+    {
+        c_actionExecutive *executive = new c_actionExecutive(this);
+        connect(executive, SIGNAL(connectionEstablishedConfirmationReceived()), _PARENT_MOD_CTRLR_, SLOT(moduleConnectedWithLocalServer()));
+
+
+        QString errMsg = QString("TPrzetwarzam otrzymana paczke. \n");
+        logsWindow->addLog(errMsg);
+
+        executive->processData(data);
+
+        executive->deleteLater();
+    }
+    else
+    {
+        //błąd złegodopasownia wątku
+
+        QString errMsg = QString("Thread ERROR. \n Wrong THREAD DESTINATION or THREAD ID");
+        logsWindow->addLog(errMsg);
+    }
 }
 
 w_logsWindow *c_clientProcessConnection::getLogsWindow() const
@@ -66,6 +90,16 @@ void c_clientProcessConnection::replyReceived(QByteArray processedRequestMd5Hash
 
     ds2 << packet.md5_hash.toHex() << json;
     emit sendDataToClient(packet);
+}
+
+bool c_clientProcessConnection::getConfiguredCorrectly() const
+{
+    return configuredCorrectly;
+}
+
+void c_clientProcessConnection::setConfiguredCorrectly(bool newConfiguredCorrectly)
+{
+    configuredCorrectly = newConfiguredCorrectly;
 }
 
 void c_clientProcessConnection::connected()
