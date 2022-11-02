@@ -54,9 +54,15 @@ signals:
     void errors(QMap<QString, myStructures::threadData> errors);
     void resultReady(myTypes::JsonContent jsonContent, QList<QMap<QString, QVariant>> results);    
     void errors(QMap<QString, QString> * receivedErrors);
-    void replyReady(QByteArray processedRequestMd5Hash, QByteArray json);
+    void replyToConnectionRequestReady(QByteArray processedRequestMd5Hash, QByteArray json);
 
     void connectionEstablishedConfirmationReceived();
+
+    void userLogsReceivedFromServerResultReady(QList<QMap<QString, QVariant>> logs);
+    void userEmployeeLogsReceivedFromServerResultReady(QList<QMap<QString, QVariant>> logs);
+    void employeeLogsReceivedFromServerResultReady(QList<QMap<QString, QVariant>> logs);
+    void employeePropertiesReceivedFromServerResultReady(QMap<QString, QVariant> properties);
+    void userPropertiesReceivedFromServerResultReady(QMap<QString, QVariant> properties);
 
 };
 

@@ -75,6 +75,8 @@ void c_actionExecutive::processGet(myStructures::threadData data, QMap<QString, 
 
 void c_actionExecutive::processReply(myStructures::threadData data, QMap<QString, QString> * processedDataErrors)
 {
+        logs->addLog(QString("c_actionExecutive::processReply(myStructures::threadData data, QMap<QString, QString> * processedDataErrors)\n"));
+
         c_Parser parser;
         myTypes::JsonContent jsonContent = data.content;
         QList<QMap<QString, QVariant>> jsonData = data.data;
@@ -117,7 +119,7 @@ void c_actionExecutive::processRequest(myStructures::threadData data, QMap<QStri
 
 
         QJsonDocument replyJSON = parser.prepareJson(packetInfo, dataForJSON);
-        emit replyReady(data.ref_md5, replyJSON.toJson());
+        emit replyToConnectionRequestReady(data.ref_md5, replyJSON.toJson());
 
         break;
     }
@@ -133,6 +135,41 @@ void c_actionExecutive::processResults(myTypes::JsonContent jsonContent, QList<Q
     }
     case myTypes::ERRORS: {
         emit errors(&processedDataErrors);
+        break;
+    }
+    case myTypes::USER_PROPERTIES_ANSWER: {
+        if(results.isEmpty())
+            emit userPropertiesReceivedFromServerResultReady( QMap<QString, QVariant>() );
+        else
+            emit userPropertiesReceivedFromServerResultReady( results[0] );
+        break;
+    }
+    case myTypes::EMPLOYEE_PROPERTIES_ANSWER: {
+        if(results.isEmpty())
+            emit employeePropertiesReceivedFromServerResultReady( QMap<QString, QVariant>() );
+        else
+            emit employeePropertiesReceivedFromServerResultReady( results[0] );
+        break;
+    }
+    case myTypes::USER_LOGS_ANSWER: {
+        if(results.isEmpty())
+            emit userLogsReceivedFromServerResultReady( QList<QMap<QString, QVariant>>() );
+        else
+            emit userLogsReceivedFromServerResultReady(results);
+        break;
+    }
+    case myTypes::USER_EMPLOYEE_LOGS_ANSWER: {
+        if(results.isEmpty())
+            emit userEmployeeLogsReceivedFromServerResultReady( QList<QMap<QString, QVariant>>() );
+        else
+            emit userEmployeeLogsReceivedFromServerResultReady(results);
+        break;
+    }
+    case myTypes::EMPLOYEE_LOGS_ANSWER: {
+        if(results.isEmpty())
+            emit employeeLogsReceivedFromServerResultReady( QList<QMap<QString, QVariant>>() );
+        else
+            emit employeeLogsReceivedFromServerResultReady(results);
         break;
     }
     default:

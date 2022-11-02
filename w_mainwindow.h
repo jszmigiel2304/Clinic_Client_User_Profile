@@ -3,6 +3,7 @@
 
 #include "c_myStructures.h"
 #include "c_waitingloop.h"
+#include "w_logswindow.h"
 
 #include <QMainWindow>
 #include <QScrollArea>
@@ -41,6 +42,8 @@ private:
     QList<myStructures::myLog> Logs;
     QMap<QString, QVariant> userProperties;
     QMap<QString, QVariant> employeeProperties;
+
+    w_logsWindow* logsWnd;
 
 
 private slots:

@@ -74,6 +74,12 @@ private slots:
     void getUserPropertiesFromServer(qint32 id = -1, QString name = QString(""), QString password = QString(""));
     void getEmployeePropertiesFromServer(qint32 id = -1, QString name = QString(""), QString password = QString(""));
     void getLogsFromServer(qint32 id = -1, QString name = QString(""), QString password = QString(""));
+    void userPropertiesReceivedFromServer(QMap<QString, QVariant> properties);
+    void employeePropertiesReceivedFromServer(QMap<QString, QVariant> properties);
+    void userLogsReceivedFromServer(QList<QMap<QString, QVariant>> logs);
+    void userEmployeeLogsReceivedFromServer(QList<QMap<QString, QVariant>> logs);
+    void emlpoyeeLogsReceivedFromServer(QList<QMap<QString, QVariant>> logs);
+    void connected();
 
 signals:
     void aboutToClose();

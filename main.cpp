@@ -67,16 +67,14 @@ int main(int argc, char *argv[])
 
 //    moduleCtrlr->setMainWnd(w);
     moduleCtrlr->getMainWnd()->show();
-    moduleCtrlr->connectToLocalServer();
     moduleCtrlr->setUserCtrlr( new c_userController(args) );
-    moduleCtrlr->updateMainWindow();
+    moduleCtrlr->connectToLocalServer();
+//    moduleCtrlr->updateMainWindow();
 
 
 
     QObject::connect(&a, SIGNAL(aboutToQuit()), moduleCtrlr, SLOT(deleteLater()));
-//    QObject::connect(&a, SIGNAL(aboutToQuit()), w, SLOT(deleteLater()));
-
-//    w->show();
+    QObject::connect(&a, SIGNAL(aboutToQuit()),  w_logsWindow::Instance(), SLOT(deleteLater()));
 
     return a.exec();
 }

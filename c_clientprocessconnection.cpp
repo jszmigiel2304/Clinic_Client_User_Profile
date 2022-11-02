@@ -155,8 +155,7 @@ void c_clientProcessConnection::bytesWritten(qint64 bytes)
 }
 
 void c_clientProcessConnection::readyRead()
-{        
-    logsWindow->addLog( QString("c_clientProcessConnection::readyRead() - zaczynam czytać \n") );
+{
 
     QByteArray myPack;
 
@@ -165,10 +164,9 @@ void c_clientProcessConnection::readyRead()
         if( QString::fromUtf8(line) == QString("PACKET_BEGINNING\n") ) {
             myPack.clear();
         } else if( QString::fromUtf8(line) == QString("PACKET_END\n") ) {
-            QString log = QString("%1 has been read. \n").arg(myPack.size());
-            emit newLog(log);
-
             emit dataReceived(myPack.size(), myPack);
+
+            logsWindow->addLog( QString("przeczytano!!!!!!!!!!!!!!\n") );
         } else {
             myPack.append(line);
         }

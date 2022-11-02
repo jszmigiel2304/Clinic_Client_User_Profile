@@ -5,7 +5,11 @@ w_MainWindow::w_MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::w_MainWindow)
 {
+    logsWnd = w_logsWindow::Instance();
+
     ui->setupUi(this);
+
+    connect(this->ui->b_more_logs_button_2, SIGNAL(clicked(bool)), this, SLOT(moreLogsButtonClicked(bool)));
 }
 
 w_MainWindow::~w_MainWindow()
@@ -27,7 +31,11 @@ QList<myStructures::myLog> *w_MainWindow::getLogs()
 
 void w_MainWindow::setLogs(QList<myStructures::myLog> newLogs)
 {
+    logsWnd->addLog(QString("w_MainWindow::setLogs(QList<myStructures::myLog> newLogs)\n"));
     Logs = newLogs;
+    logsWnd->addLog(QString("%1\n").arg(Logs.size()));
+
+    refresh();
 }
 
 QMap<QString, QVariant> *w_MainWindow::getUserProperties()
@@ -47,7 +55,9 @@ QMap<QString, QVariant> *w_MainWindow::getEmployeeProperties()
 
 void w_MainWindow::setEmployeeProperties(QMap<QString, QVariant> newEmployeeProperties)
 {
+    logsWnd->addLog(QString("w_MainWindow::setEmployeeProperties(QMap<QString, QVariant> newEmployeeProperties)\n"));
     employeeProperties = newEmployeeProperties;
+    logsWnd->addLog(QString("%1\n").arg(employeeProperties.size()));
 }
 
 void w_MainWindow::processing(QString text)
@@ -84,7 +94,6 @@ void w_MainWindow::moreLogsButtonClicked(bool checked)
 
 void w_MainWindow::refreshUserInfo()
 {
-    if(userProperties.isEmpty()) return;
 
     ui->l_username->setText( userProperties["name"].toString() );
     ui->l_id->setText( QString("%1").arg(userProperties["id"].toInt()) );
@@ -101,7 +110,8 @@ void w_MainWindow::refreshUserInfo()
 
 void w_MainWindow::refreshEmployeeInfo()
 {
-    if(employeeProperties .isEmpty()) return;
+    logsWnd->addLog(QString("w_MainWindow::refreshEmployeeInfo() START\n"));
+
     ui->l_names->setText( QString("%1 %2").arg(employeeProperties["name"].toString(), employeeProperties["second_name"].toString()) );
     ui->l_last_name->setText( employeeProperties["last_name"].toString() );
     ui->l_pesel->setText( employeeProperties["pesel"].toString() );
@@ -131,11 +141,13 @@ void w_MainWindow::refreshEmployeeInfo()
     ui->l_supervisor->setText( QString("%1 %2").arg(employeeProperties["supervisor_name"].toString(), employeeProperties["supervisor_last_name"].toString()) );
     ui->l_salary_base->setText( QString("%1").arg( employeeProperties["salary_base"].toDouble() ));
     ui->l_salary_bonus->setText( QString("%1").arg( employeeProperties["salary_bonus"].toDouble()) );
+
+    logsWnd->addLog(QString("w_MainWindow::refreshEmployeeInfo() KONIEC\n"));
 }
 
 void w_MainWindow::refreshLogs()
 {
-    if(Logs.isEmpty()) return;
+    logsWnd->addLog(QString("w_MainWindow::refreshLogs() START\n"));
     for( int i = 0; i < 11 && i < Logs.size(); i++) {
         QLabel * l_log = new QLabel(ui->w_logs_container);
         l_log->setStyleSheet( QString("color: rgb(221, 221, 221);") );
@@ -144,6 +156,8 @@ void w_MainWindow::refreshLogs()
         l_log->setText( QString("%2\t%3\t[ %1 ]").arg( Logs[i].log_text, Logs[i].time.toString(), Logs[i].ip_address.toString() ) );
         l_log->show();
     }
+
+    logsWnd->addLog(QString("w_MainWindow::refreshLogs() KONIEC\n"));
 }
 
 

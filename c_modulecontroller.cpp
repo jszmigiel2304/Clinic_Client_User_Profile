@@ -17,7 +17,6 @@ c_moduleController::c_moduleController(QByteArray serverId, QByteArray moduleId,
 
 c_moduleController::~c_moduleController()
 {
-
     connection->deleteLater();
     mainWnd->deleteLater();
     userCtrlr->deleteLater();
@@ -41,7 +40,13 @@ void c_moduleController::processData(myStructures::threadData data)
     if(data.thread_dest == myTypes::CLINIC_MODULE  || data.thread_dest == myTypes::CLINIC_MODULE_ERROR)
     {
         c_actionExecutive *executive = new c_actionExecutive(this);
-        connect(executive, SIGNAL(replyReady(QByteArray, QByteArray)), getConnection(), SLOT(replyReceived(QByteArray, QByteArray)));
+        connect(executive, SIGNAL(replyToConnectionRequestReady(QByteArray, QByteArray)), getConnection(), SLOT(replyReceived(QByteArray, QByteArray)));
+        connect( executive, SIGNAL(userLogsReceivedFromServerResultReady(QList<QMap<QString, QVariant>>)), this, SLOT(userLogsReceivedFromServer(QList<QMap<QString, QVariant>>)) );
+        connect( executive, SIGNAL(userEmployeeLogsReceivedFromServerResultReady(QList<QMap<QString, QVariant>>)), this, SLOT(userEmployeeLogsReceivedFromServer(QList<QMap<QString, QVariant>>)) );
+        connect( executive, SIGNAL(employeeLogsReceivedFromServerResultReady(QList<QMap<QString, QVariant>>)), this, SLOT(emlpoyeeLogsReceivedFromServer(QList<QMap<QString, QVariant>>)) );
+        connect( executive, SIGNAL(employeePropertiesReceivedFromServerResultReady(QMap<QString, QVariant>)), this, SLOT(employeePropertiesReceivedFromServer(QMap<QString, QVariant>)) );
+        connect( executive, SIGNAL(userPropertiesReceivedFromServerResultReady(QMap<QString, QVariant>)), this, SLOT(userPropertiesReceivedFromServer(QMap<QString, QVariant>)) );
+
 
 
         QString errMsg = QString("TPrzetwarzam otrzymana paczke. \n");
@@ -73,16 +78,19 @@ void c_moduleController::updateMainWindow()
         connect(waitingLoop, SIGNAL(exitLoop(int)), mainWnd, SLOT(processingFinished(int)));
 
         if(userCtrlr->getId() == 0) {
-            connect(userCtrlr, SIGNAL(propertiesSaved()), waitingLoop->newCondition(), SLOT(conditionFulfilled()) );
-            connect(userCtrlr, SIGNAL(passProperties(QMap<QString, QVariant>)), mainWnd, SLOT(setUserProperties(QMap<QString, QVariant>)) );
+            logsWindow->addLog(QString("connects user\n"));
+            connect(userCtrlr, SIGNAL(propertiesSaved()), waitingLoop->newCondition(), SLOT(conditionFulfilled()) , Qt::DirectConnection);
+            connect(userCtrlr, SIGNAL(passProperties(QMap<QString, QVariant>)), mainWnd, SLOT(setUserProperties(QMap<QString, QVariant>)), Qt::DirectConnection );
         }
         if(userCtrlr->getEmployee()->getId() == 0) {
-            connect(userCtrlr->getEmployee(), SIGNAL(propertiesSaved()), waitingLoop->newCondition(), SLOT(conditionFulfilled()) );
-            connect(userCtrlr->getEmployee(), SIGNAL(passProperties(QMap<QString, QVariant>)), mainWnd, SLOT(setEmployeeProperties(QMap<QString, QVariant>)) );
+            logsWindow->addLog(QString("connects employ\n"));
+            connect(userCtrlr->getEmployee(), SIGNAL(propertiesSaved()), waitingLoop->newCondition(), SLOT(conditionFulfilled()), Qt::DirectConnection );
+            connect(userCtrlr->getEmployee(), SIGNAL(passProperties(QMap<QString, QVariant>)), mainWnd, SLOT(setEmployeeProperties(QMap<QString, QVariant>)), Qt::DirectConnection );
         }
         if(userCtrlr->getDbLogs().isEmpty()) {
-            connect(userCtrlr, SIGNAL(logsSaved()), waitingLoop->newCondition(), SLOT(conditionFulfilled()) );
-            connect(userCtrlr, SIGNAL(passLogs(QList<myStructures::myLog>)), mainWnd, SLOT(setLogs(QList<myStructures::myLog> *)) );
+            logsWindow->addLog(QString("connects logs\n"));
+            connect(userCtrlr, SIGNAL(logsSaved()), waitingLoop->newCondition(), SLOT(conditionFulfilled()), Qt::DirectConnection );
+            connect(userCtrlr, SIGNAL(passLogs(QList<myStructures::myLog>)), mainWnd, SLOT(setLogs(QList<myStructures::myLog>)), Qt::DirectConnection );
         }
     }
 
@@ -126,6 +134,7 @@ void c_moduleController::dataReceived(quint64 data_size, QByteArray data)
     myStructures::threadData attchedData;
     parser.parseJson( &receivedDataFromServer.second, &attchedData );
 
+    logsWindow->addLog(attchedData.toString());
     logsWindow->addLog(QString("dataReceived(quint64 data_size, QByteArray data). Przetwarzam dane\n"));
 
     switch (attchedData.thread_dest) {
@@ -149,12 +158,9 @@ void c_moduleController::dataReceived(quint64 data_size, QByteArray data)
 void c_moduleController::getUserPropertiesFromServer(qint32 id, QString name, QString password)
 {
     logsWindow->addLog(QString("Pobieram user properties z servera"));
-    QMessageBox msgBox;
-    msgBox.setText("Pobieram user properties z servera");
-    msgBox.exec();
 
     c_Parser parser;
-    QPair<QByteArray, QByteArray> pair = parser.prepareGetUserPropertiesPacket(name, password, getThreadIdentifier());
+    QPair<QByteArray, QByteArray> pair = parser.prepareGetUserPropertiesPacket(name, password, getNameThreadDestination(), getThreadIdentifier());
 
     myStructures::packet packet;
     packet.md5_hash = pair.first;
@@ -167,12 +173,9 @@ void c_moduleController::getUserPropertiesFromServer(qint32 id, QString name, QS
 void c_moduleController::getEmployeePropertiesFromServer(qint32 id, QString name, QString password)
 {
     logsWindow->addLog(QString("Pobieram employee properties z servera\n"));
-    QMessageBox msgBox;
-    msgBox.setText("Pobieram employee properties z servera.");
-    msgBox.exec();
 
     c_Parser parser;
-    QPair<QByteArray, QByteArray> pair = parser.prepareGetEmployeePropertiesPacket(name, password, getThreadIdentifier());
+    QPair<QByteArray, QByteArray> pair = parser.prepareGetEmployeePropertiesPacket(name, password, getNameThreadDestination(), getThreadIdentifier());
 
     myStructures::packet packet;
     packet.md5_hash = pair.first;
@@ -185,12 +188,9 @@ void c_moduleController::getEmployeePropertiesFromServer(qint32 id, QString name
 void c_moduleController::getLogsFromServer(qint32 id, QString name, QString password)
 {
     logsWindow->addLog(QString("Pobieram logi z servera\n"));
-    QMessageBox msgBox;
-    msgBox.setText("Pobieram logi z servera.");
-    msgBox.exec();
 
     c_Parser parser;
-    QPair<QByteArray, QByteArray> pair = parser.prepareGetLogsPacket(id, name, password, getThreadIdentifier());
+    QPair<QByteArray, QByteArray> pair = parser.prepareGetLogsPacket(id, name, password, getNameThreadDestination(), getThreadIdentifier());
 
     myStructures::packet packet;
     packet.md5_hash = pair.first;
@@ -198,6 +198,41 @@ void c_moduleController::getLogsFromServer(qint32 id, QString name, QString pass
     packet.wait_for_reply = true;
 
     emit connection->sendDataToClient(packet);
+}
+
+void c_moduleController::userPropertiesReceivedFromServer(QMap<QString, QVariant> properties)
+{
+    logsWindow->addLog(QString("c_moduleController::userPropertiesReceivedFromServer(QMap<QString, QVariant> properties)\n"));
+    getUserCtrlr()->setProperties(properties);
+}
+
+void c_moduleController::employeePropertiesReceivedFromServer(QMap<QString, QVariant> properties)
+{
+    logsWindow->addLog(QString("c_moduleController::employeePropertiesReceivedFromServer(QMap<QString, QVariant> properties)\n"));
+    getUserCtrlr()->getEmployee()->setProperties(properties);
+}
+
+void c_moduleController::userLogsReceivedFromServer(QList<QMap<QString, QVariant> > logs)
+{
+    logsWindow->addLog(QString("c_moduleController::userLogsReceivedFromServer(QList<QMap<QString, QVariant> > logs)\n"));
+    getUserCtrlr()->setDbLogs(logs);
+}
+
+void c_moduleController::userEmployeeLogsReceivedFromServer(QList<QMap<QString, QVariant> > logs)
+{
+    logsWindow->addLog(QString("c_moduleController::userEmployeeLogsReceivedFromServer(QList<QMap<QString, QVariant> > logs)\n"));
+    getUserCtrlr()->setDbLogs(logs);
+}
+
+void c_moduleController::emlpoyeeLogsReceivedFromServer(QList<QMap<QString, QVariant> > logs)
+{
+    logsWindow->addLog(QString("c_moduleController::emlpoyeeLogsReceivedFromServer(QList<QMap<QString, QVariant> > logs)\n"));
+    getUserCtrlr()->setDbLogs(logs);
+}
+
+void c_moduleController::connected()
+{
+    updateMainWindow();
 }
 
 void c_moduleController::getPropertiesFromServer(QMap<QString, QVariant> *userProperties, QMap<QString, QVariant> *employeeProperties, QList<myStructures::myLog> *Logs)
@@ -212,14 +247,8 @@ void c_moduleController::getPropertiesFromServer(QMap<QString, QVariant> *userPr
     }
 
     if(userCtrlr->getEmployee()->getId() == 0 || userCtrlr->getEmployee()->getName().isEmpty()) {
-        QMessageBox msgBox;
-        msgBox.setText("Pobieram getEmployeePropertiesFromServer z servera.");
-        msgBox.exec();
         getEmployeePropertiesFromServer();
     } else {
-        QMessageBox msgBox;
-        msgBox.setText("Przepisuje employee properties");
-        msgBox.exec();
         logsWindow->addLog(QString("Przepisuje employee properties\n"));
         (*employeeProperties) = userCtrlr->getEmployee()->getProperties();
     }
@@ -230,9 +259,6 @@ void c_moduleController::getPropertiesFromServer(QMap<QString, QVariant> *userPr
         logsWindow->addLog(QString("Przepisuje logi properties\n"));
         (*Logs) = userCtrlr->getDbLogs();
     }
-    QMessageBox msgBo2x;
-    msgBo2x.setText("getPropertiesFromServer(QMap<QString, QVariant> *userProperties, QMap<QString, QVariant> *employeeProperties, QList<myStructures::myLog> *Logs) koniec.");
-    msgBo2x.exec();
 }
 
 void c_moduleController::dataReceived(myStructures::threadData data)
@@ -258,6 +284,7 @@ void c_moduleController::connectToLocalServer()
     connect(waitingLoop, SIGNAL(exitLoop(int)), mainWnd, SLOT(processingFinished(int)));
 
     connect(this, SIGNAL(moduleConnectedWithServer()), waitingLoop->newCondition(), SLOT(conditionFulfilled()) );
+    connect(this, SIGNAL(moduleConnectedWithServer()), this, SLOT(connected()) );
 
     getConnection()->establishConnection();
 
