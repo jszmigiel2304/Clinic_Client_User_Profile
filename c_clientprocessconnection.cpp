@@ -6,8 +6,6 @@
 c_clientProcessConnection::c_clientProcessConnection(QByteArray serverIdentifier, QObject *parent)
     : QObject{parent}, serverIdentifier(serverIdentifier)
 {
-    logsWindow = w_logsWindow::Instance();
-
     configuredCorrectly = false;
     socket = new QLocalSocket();
 
@@ -34,25 +32,14 @@ c_clientProcessConnection::~c_clientProcessConnection()
 void c_clientProcessConnection::establishConnection()
 {
     socket->connectToServer(serverIdentifier.toHex(), QIODeviceBase::ReadWrite);
-
-    if(socket->state() == QLocalSocket::ConnectedState)
-        logsWindow->addLog( QString("Nawiązano połączenie z QLocalServer: %1").arg(serverIdentifier.toHex()) );
-    else
-        logsWindow->addLog( QString("Nie Nawiązano połączenia z QLocalServer: %1").arg(serverIdentifier.toHex()) );
 }
 
 void c_clientProcessConnection::processData(myStructures::threadData data)
 {
-    logsWindow->addLog(data.toString());
-
     if(data.thread_dest == myTypes::CLINIC_MODULE_CONNECTION_CONTROLLER  || data.thread_dest == myTypes::CLINIC_MODULE_ERROR)
     {
         c_actionExecutive *executive = new c_actionExecutive(this);
         connect(executive, SIGNAL(connectionEstablishedConfirmationReceived()), _PARENT_MOD_CTRLR_, SLOT(moduleConnectedWithLocalServer()));
-
-
-        QString errMsg = QString("TPrzetwarzam otrzymana paczke. \n");
-        logsWindow->addLog(errMsg);
 
         executive->processData(data);
 
@@ -61,20 +48,7 @@ void c_clientProcessConnection::processData(myStructures::threadData data)
     else
     {
         //błąd złegodopasownia wątku
-
-        QString errMsg = QString("Thread ERROR. \n Wrong THREAD DESTINATION or THREAD ID");
-        logsWindow->addLog(errMsg);
     }
-}
-
-w_logsWindow *c_clientProcessConnection::getLogsWindow() const
-{
-    return logsWindow;
-}
-
-void c_clientProcessConnection::setLogsWindow(w_logsWindow *newLogsWindow)
-{
-    logsWindow = newLogsWindow;
 }
 
 void c_clientProcessConnection::replyReceived(QByteArray processedRequestMd5Hash, QByteArray json)
@@ -103,55 +77,27 @@ void c_clientProcessConnection::setConfiguredCorrectly(bool newConfiguredCorrect
 }
 
 void c_clientProcessConnection::connected()
-{    
-    logsWindow->addLog( QString("c_clientProcessConnection::connected() \n") );
+{
 }
 
 void c_clientProcessConnection::disconnected()
 {
-    logsWindow->addLog( QString("c_clientProcessConnection::disconnected() \n") );
 }
 
 void c_clientProcessConnection::errorOccurred(QLocalSocket::LocalSocketError socketError)
 {
-    logsWindow->addLog( QString("c_clientProcessConnection::errorOccurred(QLocalSocket::LocalSocketError socketError) \n") );
-    //LocalSocketError { ConnectionRefusedError, PeerClosedError, ServerNotFoundError, SocketAccessError, SocketResourceError, …, UnknownSocketError }
-    switch(socketError) {
-    case QLocalSocket::ConnectionRefusedError: {logsWindow->addLog( QString("ConnectionRefusedError \n") ); return;}
-    case QLocalSocket::PeerClosedError: {logsWindow->addLog( QString("PeerClosedError \n") ); return;}
-    case QLocalSocket::ServerNotFoundError: {logsWindow->addLog( QString("ServerNotFoundError \n") ); return;}
-    case QLocalSocket::SocketAccessError: {logsWindow->addLog( QString("SocketAccessError \n") ); return;}
-    case QLocalSocket::SocketResourceError: {logsWindow->addLog( QString("SocketResourceError \n") ); return;}
-    case QLocalSocket::SocketTimeoutError: {logsWindow->addLog( QString("SocketTimeoutError \n") ); return;}
-    case QLocalSocket::DatagramTooLargeError: {logsWindow->addLog( QString("DatagramTooLargeError \n") ); return;}
-    case QLocalSocket::ConnectionError: {logsWindow->addLog( QString("ConnectionError \n") ); return;}
-    case QLocalSocket::UnsupportedSocketOperationError: {logsWindow->addLog( QString("UnsupportedSocketOperationError \n") ); return;}
-    case QLocalSocket::OperationError: {logsWindow->addLog( QString("OperationError \n") ); return;}
-    case QLocalSocket::UnknownSocketError: {logsWindow->addLog( QString("UnknownSocketError \n") ); return;}
-    default: {logsWindow->addLog( QString("UnknownSocketError \n") ); return;}
-    }
 }
 
 void c_clientProcessConnection::stateChanged(QLocalSocket::LocalSocketState socketState)
 {
-    logsWindow->addLog( QString("c_clientProcessConnection::stateChanged(QLocalSocket::LocalSocketState socketState) \n") );
-    switch (socketState) {
-    case QLocalSocket::UnconnectedState: {logsWindow->addLog( QString("UnconnectedState \n") ); return;}
-    case QLocalSocket::ConnectingState: {logsWindow->addLog( QString("ConnectingState \n") ); return;}
-    case QLocalSocket::ConnectedState: {logsWindow->addLog( QString("ConnectedState \n") ); return;}
-    case QLocalSocket::ClosingState: {logsWindow->addLog( QString("ClosingState \n") ); return;}
-    default: {logsWindow->addLog( QString("No state att. \n") ); return;}
-    }
 }
 
 void c_clientProcessConnection::aboutToClose()
 {
-    logsWindow->addLog( QString("c_clientProcessConnection::aboutToClose() \n") );
 }
 
 void c_clientProcessConnection::bytesWritten(qint64 bytes)
 {
-    logsWindow->addLog( QString("c_clientProcessConnection::bytesWritten(qint64 bytes) Zapisano [ %1 ] bytes\n").arg(bytes) );
 }
 
 void c_clientProcessConnection::readyRead()
@@ -165,8 +111,6 @@ void c_clientProcessConnection::readyRead()
             myPack.clear();
         } else if( QString::fromUtf8(line) == QString("PACKET_END\n") ) {
             emit dataReceived(myPack.size(), myPack);
-
-            logsWindow->addLog( QString("przeczytano!!!!!!!!!!!!!!\n") );
         } else {
             myPack.append(line);
         }
@@ -176,10 +120,7 @@ void c_clientProcessConnection::readyRead()
 
 void c_clientProcessConnection::passDataToClient(myStructures::packet packet)
 {
-    logsWindow->addLog( QString("c_clientProcessConnection::passDataToClient(myStructures::packet packet) - wysyłam pakiet \n") );
     socket->write( QString("PACKET_BEGINNING\n").toUtf8() );
     socket->write( packet.packet_to_send );
     socket->write( QString("PACKET_END\n").toUtf8() );
-
-    QString log = QString("%1 has been written. \n").arg(packet.packet_to_send.size());
 }

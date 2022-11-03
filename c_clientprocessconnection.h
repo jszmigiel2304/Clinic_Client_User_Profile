@@ -3,7 +3,6 @@
 
 #include "c_myStructures.h"
 #include "cv_processdata.h"
-#include "w_logswindow.h"
 #include "c_parser.h"
 #include "c_moduleapplication.h"
 #include "c_actionexecutive.h"
@@ -20,7 +19,6 @@
 #include <QTime>
 #include <QTimer>
 #include <QApplication>
-#include <QMessageBox>
 
 class c_clientProcessConnection : public QObject, public cv_ProcessData
 {
@@ -35,9 +33,6 @@ public:
 
     void processData(myStructures::threadData data) override;
 
-    w_logsWindow *getLogsWindow() const;
-    void setLogsWindow(w_logsWindow *newLogsWindow);
-
     bool getConfiguredCorrectly() const;
     void setConfiguredCorrectly(bool newConfiguredCorrectly);
 
@@ -49,8 +44,6 @@ private:
     QByteArray serverIdentifier; //służy w połączeniu do odpiweiniego QLocalServer, c_processesControllerThread::QLocalServer *localServer; w Clinic Client
     bool configuredCorrectly;   // true - gdy Clinic Client poprawnie połączy QLocalSocket(c_moduleProcessConnection) z c_moduleProcess( QProcess )
     const myTypes::ThreadDestination nameThreadDestination = myTypes::CLINIC_MODULE_CONNECTION_CONTROLLER;
-
-    w_logsWindow * logsWindow;
 
 private slots:
     //from QLocalSocket

@@ -2,7 +2,6 @@
 #define C_EMPLOYEE_H
 
 #include "m_employee.h"
-#include "w_logswindow.h"
 
 #include <QObject>
 #include <QMap>
@@ -26,7 +25,6 @@ public slots:
 
 private:
     c_employee * supervisor;
-    w_logsWindow *logs;
 
 signals:
     void propertiesSaved();

@@ -6,8 +6,6 @@
 c_actionExecutive::c_actionExecutive(QObject *parent)
     : QObject{parent}
 {
-    logs = w_logsWindow::Instance();
-
     connect( this, SIGNAL(resultReady(myTypes::JsonContent, QList<QMap<QString, QVariant>>)), this, SLOT(processResults(myTypes::JsonContent, QList<QMap<QString, QVariant>>)), Qt::DirectConnection );
     connect( this, SIGNAL(errors(QMap<QString, QString> *)), this, SLOT(processErrors(QMap<QString, QString> *)), Qt::DirectConnection );
 }
@@ -75,8 +73,6 @@ void c_actionExecutive::processGet(myStructures::threadData data, QMap<QString, 
 
 void c_actionExecutive::processReply(myStructures::threadData data, QMap<QString, QString> * processedDataErrors)
 {
-        logs->addLog(QString("c_actionExecutive::processReply(myStructures::threadData data, QMap<QString, QString> * processedDataErrors)\n"));
-
         c_Parser parser;
         myTypes::JsonContent jsonContent = data.content;
         QList<QMap<QString, QVariant>> jsonData = data.data;
@@ -94,8 +90,6 @@ void c_actionExecutive::processRequest(myStructures::threadData data, QMap<QStri
     switch (data.type_flag) {
     case 0xFFFF0000:  // Connection to process settings request, sended after module connection established
     {
-        logs->addLog(QString("case 0xFFFF0000:  Connection to process settings request, sended after module connection established\n"));
-
         c_Parser parser;
 
         QList<QMap<QString, QVariant>> dataForJSON;
@@ -104,8 +98,6 @@ void c_actionExecutive::processRequest(myStructures::threadData data, QMap<QStri
         map["server_id"] = _PARENT_MOD_CTRLR_->getServerIdentifier().toHex();
         map["module_id"] = _PARENT_MOD_CTRLR_->getModuleIdentifier().toHex();
         map["thread_id"] = _PARENT_MOD_CTRLR_->getThreadIdentifier();
-
-        logs->addLog( QString(" server_id: %1\n module_id: %2\n thread_id: %3").arg(_PARENT_MOD_CTRLR_->getServerIdentifier().toHex(), _PARENT_MOD_CTRLR_->getModuleIdentifier().toHex(), QString("%1").arg(_PARENT_MOD_CTRLR_->getThreadIdentifier())) );
 
         dataForJSON.append(map);
 
@@ -181,8 +173,8 @@ void c_actionExecutive::processResults(myTypes::JsonContent jsonContent, QList<Q
 
 void c_actionExecutive::processErrors(QMap<QString, QString> *receivedErrors)
 {
-    foreach(const QString key, receivedErrors->keys()) {
-        emit newLog(QString("%1: %2 \n").arg(key, (*receivedErrors)[key]));
-    }
+//    foreach(const QString key, receivedErrors->keys()) {
+//        emit newLog(QString("%1: %2 \n").arg(key, (*receivedErrors)[key]));
+//    }
     receivedErrors->clear();
 }

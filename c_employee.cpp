@@ -2,7 +2,6 @@
 
 c_employee::c_employee(bool allocSupervisor, QObject *parent) : m_employee(parent)
 {
-    logs = w_logsWindow::Instance();
     setId(0);
 
     if(allocSupervisor)
@@ -110,8 +109,6 @@ void c_employee::setProperties(QMap<QString, QVariant> employeeInfo)
     setEmployment_date( QDate::fromString( employeeInfo["employment_date"].toString(), Qt::ISODate ) );
     setGender( employeeInfo["gender"].toChar() );
     setPhoto(  QByteArray(employeeInfo["photo"].toByteArray()) );
-
-    logs->addLog(QString("c_employee::setProperties(QMap<QString, QVariant> employeeInfo) ustawiono dane\n"));
 
     emit propertiesSaved();
     QMap<QString, QVariant> map = this->getProperties();

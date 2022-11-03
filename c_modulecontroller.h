@@ -1,8 +1,8 @@
 #ifndef C_MODULECONTROLLER_H
 #define C_MODULECONTROLLER_H
+
 #include "cv_processdata.h"
 #include "c_myStructures.h"
-#include "w_logswindow.h"
 #include "w_mainwindow.h"
 #include "c_clientprocessconnection.h"
 #include "c_actionexecutive.h"
@@ -11,7 +11,6 @@
 
 #include <QObject>
 #include <QObject>
-#include <QMessageBox>
 
 class c_moduleController : public QObject, public cv_ProcessData
 {
@@ -19,10 +18,6 @@ class c_moduleController : public QObject, public cv_ProcessData
 public:
     explicit c_moduleController(QByteArray serverId, QByteArray moduleId, qint32 threadId, QObject *parent = nullptr);
     ~c_moduleController();
-
-    w_logsWindow *getLogsWindow() const;
-    void setLogsWindow(w_logsWindow *newLogsWindow);
-
 
     const QByteArray &getServerIdentifier() const;
     void setServerIdentifier(const QByteArray &newServerIdentifier);
@@ -55,7 +50,6 @@ public slots:
 
 private:
     const myTypes::ThreadDestination nameThreadDestination = myTypes::CLINIC_MODULE;
-    w_logsWindow * logsWindow;
 
     QByteArray serverIdentifier;//służy w połączeniu do odpiweiniego QLocalServer, c_processesControllerThread::QLocalServer *localServer; w Clinic Client
     QByteArray moduleIdentifier;//służy w połączeniu z c_processesController::QList<c_moduleProcess *> openedModulesProcesses w Clinic Client

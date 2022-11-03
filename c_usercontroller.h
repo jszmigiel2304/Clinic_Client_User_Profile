@@ -2,7 +2,6 @@
 #define C_USERCONTROLLER_H
 
 #include "m_user.h"
-#include "w_logswindow.h"
 #include "c_employee.h"
 #include "c_parser.h"
 
@@ -10,7 +9,6 @@
 #include <QMap>
 #include <QVariant>
 #include <QMetaEnum>
-#include <QMessageBox>
 
 class c_userController : public m_user
 {
@@ -32,7 +30,6 @@ public slots:
 
 
 private:
-    w_logsWindow *logs;
 
     QList<myStructures::myLog> dbLogs;
 

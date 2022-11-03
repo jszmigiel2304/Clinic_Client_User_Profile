@@ -1,5 +1,4 @@
 #include "w_mainwindow.h"
-#include "w_logswindow.h"
 #include "c_parser.h"
 #include "c_moduleapplication.h"
 #include "c_clientprocessconnection.h"
@@ -45,36 +44,20 @@ int main(int argc, char *argv[])
     //---------------------------------------------------------------
 
 
-    { //do usuniecia, wyświetla otrzymane argumenty w w_logsWindow
-    QString log = QString("Otrzymane argumenty: \n");
-    foreach (const QString key, args.keys()) {
-        log += QString("%1:\t%2\n").arg(key, args[key].toString());
-    }
-    w_logsWindow::Instance()->addLog(log);
-    }//do usuniecia
-
-
-
-    w_logsWindow::Instance()->show();
 
     a.setProcessIdentifier( QByteArray::fromHex( args["ModuleName"].toByteArray() ));
     a.setThreadIdentifier( args["ThreadId"].toInt() );
-//    w_MainWindow *w = new w_MainWindow();
 
     c_moduleController * moduleCtrlr = new c_moduleController(QByteArray::fromHex(args["ServerName"].toByteArray()),
                                                             QByteArray::fromHex(args["ModuleName"].toByteArray()),
                                                             args["ThreadId"].toInt());
 
-//    moduleCtrlr->setMainWnd(w);
     moduleCtrlr->getMainWnd()->show();
     moduleCtrlr->setUserCtrlr( new c_userController(args) );
     moduleCtrlr->connectToLocalServer();
-//    moduleCtrlr->updateMainWindow();
-
 
 
     QObject::connect(&a, SIGNAL(aboutToQuit()), moduleCtrlr, SLOT(deleteLater()));
-    QObject::connect(&a, SIGNAL(aboutToQuit()),  w_logsWindow::Instance(), SLOT(deleteLater()));
 
     return a.exec();
 }

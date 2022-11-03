@@ -1,7 +1,6 @@
 #ifndef C_ACTIONEXECUTIVE_H
 #define C_ACTIONEXECUTIVE_H
 
-#include "w_logswindow.h"
 #include "c_myStructures.h"
 #include "c_parser.h"
 
@@ -22,12 +21,7 @@ public:
     explicit c_actionExecutive(QObject *parent = nullptr);
     ~c_actionExecutive();
 
-
-    w_logsWindow *getLogs() const;
-    void setLogs(w_logsWindow *value);
-
     void processData(myStructures::threadData data);
-
 
 public slots:
 
@@ -35,8 +29,6 @@ protected:
 
 private:
    QMap<QString, QString> processedDataErrors;
-
-    w_logsWindow *logs;
 
     void processMessage(myStructures::threadData data, QMap<QString, QString> * processedDataErrors = nullptr);
     void processGet(myStructures::threadData data, QMap<QString, QString> * processedDataErrors = nullptr);
